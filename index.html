@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="bn"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>উর্ভি ফার্মেসী</title>
+<style>
+:root{--bg:#f4f8f6;--card:#fff;--tx:#17302a;--mu:#5d7770;--pr:#0f8f6e;--bd:#d6e4df;--rd:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a17;--card:#17262a;--tx:#e6f2ee;--mu:#93aaa3;--pr:#2fc79d;--bd:#2a403b;--rd:#ff7a6b}}
+:root[data-theme="dark"]{--bg:#0f1a17;--card:#17262a;--tx:#e6f2ee;--mu:#93aaa3;--pr:#2fc79d;--bd:#2a403b;--rd:#ff7a6b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,"Noto Sans Bengali","Kalpurush",sans-serif;font-size:15px}
+header{background:var(--pr);color:#fff;padding:12px 14px;font-weight:700;font-size:18px}
+nav{display:flex;overflow-x:auto;gap:6px;padding:8px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:env(safe-area-inset-top,0px)}
+nav button{flex:none;border:1px solid var(--bd);background:var(--bg);color:var(--tx);padding:8px 12px;border-radius:8px;font:inherit}
+nav button.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+main{padding:10px;max-width:760px;margin:auto}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:10px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat b{display:block;font-size:20px;color:var(--pr)}.stat span{color:var(--mu);font-size:13px}
+input,select{width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit;margin:3px 0}
+label{font-size:13px;color:var(--mu)}
+.btn{background:var(--pr);color:#fff;border:0;padding:10px 14px;border-radius:8px;font:inherit;font-weight:600;width:100%;margin-top:6px}
+.btn.s{width:auto;padding:5px 10px;margin:0;font-size:13px}.btn.r{background:var(--rd)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd)}
+.row:last-child{border:0}.mu{color:var(--mu);font-size:13px}.red{color:var(--rd)}
+.sc{overflow-x:auto}h3{margin:4px 0 8px}
+</style></head><body>
+<header>💊 উর্ভি ফার্মেসী</header>
+<nav id="nav"></nav>
+<main id="m"></main>
+<script>
+const KEY="urvi_pharmacy_v1";
+let D={meds:[],sales:[],exps:[],cart:[]};
+try{const s=localStorage.getItem(KEY);if(s)D=Object.assign(D,JSON.parse(s))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}};
+const T=[["home","ড্যাশবোর্ড"],["sell","বিক্রি"],["stock","স্টক"],["acc","হিসাব"],["bak","ব্যাকআপ"]];
+let tab="home";
+const $=s=>document.querySelector(s);
+const bn=n=>(Math.round(n*100)/100).toLocaleString("bn-BD");
+const today=()=>new Date().toISOString().slice(0,10);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+function nav(){$("#nav").innerHTML=T.map(([k,v])=>`<button class="${k==tab?"on":""}" onclick="go('${k}')">${v}</button>`).join("")}
+function go(t){tab=t;nav();render()}
+function val(id){return $("#"+id).value.trim()}
+function render(){({home,sell,stock,acc,bak}[tab])()}
+
+function profit(sales){return sales.reduce((a,s)=>a+s.items.reduce((b,i)=>b+(i.price-i.cost)*i.qty,0),0)}
+function home(){
+ const t=today(),ts=D.sales.filter(s=>s.date==t);
+ const low=D.meds.filter(m=>m.qty<=(m.min||10));
+ const soon=new Date();soon.setDate(soon.getDate()+60);const sd=soon.toISOString().slice(0,10);
+ const exp=D.meds.filter(m=>m.exp&&m.exp<=sd);
+ const due=D.sales.reduce((a,s)=>a+(s.total-s.paid),0);
+ $("#m").innerHTML=`<div class="g">
+ <div class="card stat"><b>৳${bn(ts.reduce((a,s)=>a+s.total,0))}</b><span>আজকের বিক্রি</span></div>
+ <div class="card stat"><b>৳${bn(profit(ts))}</b><span>আজকের লাভ</span></div>
+ <div class="card stat"><b>${bn(D.meds.length)}</b><span>মোট ওষুধ</span></div>
+ <div class="card stat"><b class="red">৳${bn(due)}</b><span>মোট বাকি</span></div></div>
+ <div class="card"><h3>⚠️ স্টক কম (${bn(low.length)})</h3>${low.map(m=>`<div class="row"><span>${esc(m.name)}</span><b class="red">${bn(m.qty)}</b></div>`).join("")||'<span class="mu">কিছু নেই</span>'}</div>
+ <div class="card"><h3>⏰ মেয়াদ ৬০ দিনের মধ্যে (${bn(exp.length)})</h3>${exp.map(m=>`<div class="row"><span>${esc(m.name)}</span><b class="red">${m.exp}</b></div>`).join("")||'<span class="mu">কিছু নেই</span>'}</div>`}
+
+function stock(){
+ $("#m").innerHTML=`<div class="card"><h3>নতুন ওষুধ যোগ</h3>
+ <label>ওষুধের নাম</label><input id="n"><label>কোম্পানি</label><input id="co">
+ <div class="g"><div><label>ক্রয়মূল্য</label><input id="c" type="number" inputmode="decimal"></div><div><label>বিক্রয়মূল্য</label><input id="p" type="number" inputmode="decimal"></div>
+ <div><label>পরিমাণ</label><input id="q" type="number" inputmode="numeric"></div><div><label>মেয়াদ</label><input id="e" type="date"></div></div>
+ <button class="btn" onclick="addMed()">যোগ করুন</button></div>
+ <input id="sq" placeholder="🔍 ওষুধ খুঁজুন" oninput="medList()"><div class="card" id="ml"></div>`;medList()}
+function addMed(){const n=val("n");if(!n)return alert("নাম দিন");
+ D.meds.push({id:uid(),name:n,co:val("co"),cost:+val("c")||0,price:+val("p")||0,qty:+val("q")||0,exp:val("e"),min:10});save();stock()}
+function medList(){const q=($("#sq")?.value||"").toLowerCase();
+ $("#ml").innerHTML=D.meds.filter(m=>m.name.toLowerCase().includes(q)).map(m=>`<div class="row"><div><b>${esc(m.name)}</b><div class="mu">${esc(m.co)} · ক্রয় ৳${bn(m.cost)} · বিক্রয় ৳${bn(m.price)}${m.exp?" · মেয়াদ "+m.exp:""}</div></div>
+ <div style="text-align:right"><b class="${m.qty<=10?"red":""}">${bn(m.qty)}</b><br><button class="btn s" onclick="addQty('${m.id}')">+স্টক</button> <button class="btn s r" onclick="delMed('${m.id}')">✕</button></div></div>`).join("")||'<span class="mu">কোনো ওষুধ নেই</span>'}
+function addQty(id){const n=+prompt("কত পিস যোগ করবেন?");if(n>0){D.meds.find(m=>m.id==id).qty+=n;save();medList()}}
+function delMed(id){if(confirm("মুছে ফেলবেন?")){D.meds=D.meds.filter(m=>m.id!=id);save();medList()}}
+
+function sell(){
+ const tot=D.cart.reduce((a,i)=>a+i.price*i.qty,0);
+ $("#m").innerHTML=`<div class="card"><h3>নতুন বিক্রি</h3>
+ <select id="sm">${D.meds.filter(m=>m.qty>0).map(m=>`<option value="${m.id}">${esc(m.name)} (স্টক ${m.qty}) ৳${m.price}</option>`).join("")}</select>
+ <input id="sqt" type="number" inputmode="numeric" placeholder="পরিমাণ" value="1">
+ <button class="btn" onclick="toCart()">কার্টে যোগ</button></div>
+ <div class="card">${D.cart.map((i,x)=>`<div class="row"><span>${esc(i.name)} × ${bn(i.qty)}</span><span>৳${bn(i.price*i.qty)} <button class="btn s r" onclick="D.cart.splice(${x},1);sell()">✕</button></span></div>`).join("")||'<span class="mu">কার্ট খালি</span>'}
+ <div class="row"><b>মোট</b><b>৳${bn(tot)}</b></div>
+ <label>গ্রাহকের নাম</label><input id="cu"><label>নগদ পেলাম</label><input id="pd" type="number" inputmode="decimal" value="${tot}">
+ <button class="btn" onclick="finish()">বিক্রি সম্পন্ন</button></div>
+ <div class="card"><h3>সাম্প্রতিক বিক্রি</h3>${D.sales.slice(-8).reverse().map(s=>`<div class="row"><div>${esc(s.cust||"নগদ গ্রাহক")}<div class="mu">${s.date}</div></div><div style="text-align:right">৳${bn(s.total)}${s.total>s.paid?`<div class="red mu">বাকি ৳${bn(s.total-s.paid)}</div>`:""}</div></div>`).join("")||'<span class="mu">নেই</span>'}</div>`}
+function toCart(){const m=D.meds.find(x=>x.id==val("sm"));const q=+val("sqt");if(!m||q<=0)return;
+ const inC=D.cart.filter(i=>i.id==m.id).reduce((a,i)=>a+i.qty,0);if(inC+q>m.qty)return alert("স্টকে এত নেই");
+ D.cart.push({id:m.id,name:m.name,price:m.price,cost:m.cost,qty:q});sell()}
+function finish(){if(!D.cart.length)return;
+ const total=D.cart.reduce((a,i)=>a+i.price*i.qty,0);
+ D.cart.forEach(i=>{D.meds.find(m=>m.id==i.id).qty-=i.qty});
+ D.sales.push({id:uid(),date:today(),cust:val("cu"),total,paid:Math.min(+val("pd")||0,total),items:D.cart});D.cart=[];save();sell()}
+
+function acc(){
+ const m=today().slice(0,7),ms=D.sales.filter(s=>s.date.startsWith(m)),me=D.exps.filter(e=>e.date.startsWith(m));
+ const inc=ms.reduce((a,s)=>a+s.total,0),gp=profit(ms),ex=me.reduce((a,e)=>a+e.amt,0);
+ $("#m").innerHTML=`<div class="card"><h3>এই মাসের হিসাব</h3>
+ <div class="row"><span>মোট বিক্রি</span><b>৳${bn(inc)}</b></div><div class="row"><span>মোট লাভ (বিক্রয়-ক্রয়)</span><b>৳${bn(gp)}</b></div>
+ <div class="row"><span>খরচ</span><b class="red">৳${bn(ex)}</b></div><div class="row"><span>নিট লাভ</span><b style="color:var(--pr)">৳${bn(gp-ex)}</b></div></div>
+ <div class="card"><h3>খরচ যোগ</h3><label>খাতের নাম (ভাড়া, বেতন, বিদ্যুৎ…)</label><input id="ec"><label>টাকা</label><input id="ea" type="number" inputmode="decimal">
+ <button class="btn" onclick="addExp()">যোগ করুন</button></div>
+ <div class="card"><h3>খরচের তালিকা</h3>${D.exps.slice().reverse().slice(0,15).map(e=>`<div class="row"><div>${esc(e.cat)}<div class="mu">${e.date}</div></div><span>৳${bn(e.amt)} <button class="btn s r" onclick="delExp('${e.id}')">✕</button></span></div>`).join("")||'<span class="mu">নেই</span>'}</div>
+ <div class="card"><h3>বাকির তালিকা</h3>${D.sales.map((s,i)=>({s,i})).filter(o=>o.s.total>o.s.paid).map(o=>`<div class="row"><div>${esc(o.s.cust||"—")}<div class="mu">${o.s.date}</div></div><span class="red">৳${bn(o.s.total-o.s.paid)} <button class="btn s" onclick="payDue(${o.i})">আদায়</button></span></div>`).join("")||'<span class="mu">কোনো বাকি নেই</span>'}</div>`}
+function addExp(){const a=+val("ea");if(!val("ec")||!a)return;D.exps.push({id:uid(),date:today(),cat:val("ec"),amt:a});save();acc()}
+function delExp(id){D.exps=D.exps.filter(e=>e.id!=id);save();acc()}
+function payDue(i){const s=D.sales[i],a=+prompt("কত টাকা পেলেন? বাকি ৳"+(s.total-s.paid));if(a>0){s.paid=Math.min(s.total,s.paid+a);save();acc()}}
+
+function bak(){
+ $("#m").innerHTML=`<div class="card"><h3>☁️ Google Drive ব্যাকআপ</h3>
+ <p class="mu">১) নিচের বাটনে ব্যাকআপ ফাইল ডাউনলোড করুন। ২) ফাইলটি Google Drive-এ আপলোড করুন। প্রতিদিন দোকান বন্ধের আগে ব্যাকআপ নেওয়া ভালো।</p>
+ <button class="btn" onclick="backup()">ব্যাকআপ ডাউনলোড (JSON)</button>
+ <button class="btn" onclick="csv()">বিক্রির হিসাব (CSV/Excel)</button>
+ <button class="btn" onclick="csvStock()">স্টক তালিকা (CSV/Excel)</button></div>
+ <div class="card"><h3>ব্যাকআপ ফিরিয়ে আনুন</h3><p class="mu">Drive থেকে ফাইল ডাউনলোড করে এখানে দিন। বর্তমান ডেটা বদলে যাবে।</p><input type="file" id="rf" accept=".json" onchange="restore(this)"></div>
+ <p id="st" class="mu"></p>`}
+async function dl(name,data){
+ try{const d=await claude.use("downloads");if(!d)throw 0;await d.save({filename:name,data});$("#st").textContent="✅ ফাইল সেভ হয়েছে"}
+ catch(e){$("#st").textContent=e&&e.code=="declined"?"বাতিল করা হয়েছে":"এই ভিউতে ডাউনলোড সম্ভব হয়নি"}}
+function backup(){dl("urvi-pharmacy-backup-"+today()+".json",JSON.stringify(D))}
+const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+function csv(){const r=["তারিখ,গ্রাহক,মোট,পরিশোধ,বাকি,লাভ"];D.sales.forEach(s=>r.push([s.date,q(s.cust||""),s.total,s.paid,s.total-s.paid,profit([s])].join(",")));dl("urvi-sales-"+today()+".csv","\ufeff"+r.join("\n"))}
+function csvStock(){const r=["নাম,কোম্পানি,ক্রয়,বিক্রয়,পরিমাণ,মেয়াদ"];D.meds.forEach(m=>r.push([q(m.name),q(m.co),m.cost,m.price,m.qty,m.exp].join(",")));dl("urvi-stock-"+today()+".csv","\ufeff"+r.join("\n"))}
+function restore(el){const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o.meds)throw 0;D=Object.assign({meds:[],sales:[],exps:[],cart:[]},o);save();alert("ডেটা ফিরে এসেছে ✅");go("home")}catch(e){alert("ফাইলটি সঠিক নয়")}};r.readAsText(f)}
+nav();render();
+</script></body></html>
