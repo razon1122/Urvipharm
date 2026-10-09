@@ -20,3 +20,4 @@ App data is saved in the current browser's `localStorage`. Use **ব্যাক
 - Supplier list
 - Inventory report
 - Local persistence and JSON backup import/export
+yes
