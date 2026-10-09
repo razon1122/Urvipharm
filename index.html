@@ -1,13 +1,46 @@
 <!doctype html>
 <html lang="bn">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f7f9f8" />
-    <title>Urvi Pharmacy — ফার্মেসি ব্যবস্থাপনা</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  </head>
-  <body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#147d56" />
+  <meta name="description" content="উর্বী ফার্মেসি — ফার্মেসি ব্যবস্থাপনা" />
+  <title>উর্বী ফার্মেসি</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#dashboard"><span class="brand-mark">✚</span><span><b>Urvi <i>Pharmacy</i></b><small>স্মার্ট ফার্মেসি ম্যানেজমেন্ট</small></span></a>
+      <div class="store-card"><span class="store-avatar">উ</span><span><b>উর্বী ফার্মেসি</b><small>● প্রধান শাখা</small></span></div>
+      <nav id="navigation">
+        <p class="nav-label">মূল মেনু</p>
+        <button class="nav-item active" data-page="dashboard"><span>▦</span> ড্যাশবোর্ড</button>
+        <button class="nav-item" data-page="sales"><span>🛒</span> বিক্রয়</button>
+        <button class="nav-item" data-page="medicines"><span>▤</span> ওষুধের তালিকা</button>
+        <button class="nav-item" data-page="stock"><span>▦</span> স্টক ব্যবস্থাপনা <em id="low-count">০</em></button>
+        <p class="nav-label">ব্যবসা পরিচালনা</p>
+        <button class="nav-item" data-page="people"><span>♙</span> ক্রেতা ও সরবরাহকারী</button>
+        <button class="nav-item" data-page="reports"><span>▥</span> রিপোর্ট</button>
+        <p class="nav-label">অন্যান্য</p>
+        <button class="nav-item" data-page="settings"><span>⚙</span> সেটিংস</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="help-card"><b>সাহায্য প্রয়োজন?</b><p>আপনার ডেটা এই ব্রাউজারেই সংরক্ষিত হয়। নিয়মিত ব্যাকআপ নিন।</p><button class="text-button" data-action="export">ব্যাকআপ ডাউনলোড ↗</button></div>
+        <button class="nav-item" data-action="import"><span>⇧</span> JSON ব্যাকআপ আপলোড</button>
+        <div class="profile"><span class="store-avatar">উ</span><span><b>উর্বী ফার্মেসি</b><small id="save-state">লোকাল মোড · সংরক্ষিত</small></span></div>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+    <main class="main-area">
+      <header class="topbar"><div class="top-left"><button class="icon-button menu-toggle" id="menu-toggle" aria-label="মেনু">☰</button><span class="breadcrumb">উর্বী ফার্মেসি <span>/</span> <b id="breadcrumb">ড্যাশবোর্ড</b></span></div><div class="top-right"><span class="date-pill" id="today"></span><span class="top-avatar">উ</span></div></header>
+      <section class="page-content" id="page-content"></section>
+      <footer>© ২০২৬ উর্বী ফার্মেসি <span>•</span> অফলাইন-প্রথম ব্যবস্থাপনা <span class="save-foot" id="footer-save">ডেটা এই ডিভাইসে সংরক্ষিত</span></footer>
+    </main>
+  </div>
+  <input id="import-file" type="file" accept=".json,application/json" hidden />
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="modal" class="modal"><div id="modal-content"></div></dialog>
+  <script src="./app.js" defer></script>
+</body>
 </html>

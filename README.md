@@ -1,28 +1,22 @@
 # Urvi Pharmacy
 
-বাংলা ভাষার ফার্মেসি ম্যানেজমেন্ট ফ্রন্টএন্ড — React, TypeScript ও Vite। কোনো লগইন, Google Cloud অ্যাকাউন্ট বা ব্যাকএন্ড প্রয়োজন নেই।
+A pharmacy management app built with plain HTML, CSS, and JavaScript. No framework, bundler, backend, or login is required.
 
-## চালানোর নিয়ম
+## Run locally
 
-```bash
-npm install
-npm run dev
-```
+Open `index.html` in a browser. For GitHub Pages, push the repository to the `main` branch and set **Settings → Pages → Build and deployment → Source** to **GitHub Actions**.
 
-টার্মিনালে দেখানো Vite URL ব্রাউজারে খুলুন। প্রোডাকশন বিল্ড:
+The included workflow copies `index.html`, `styles.css`, and `app.js` to `dist/` and deploys that folder.
 
-```bash
-npm run build
-```
+## Data and backups
 
-## ডেটা সংরক্ষণ ও JSON ব্যাকআপ
+App data is saved in the current browser's `localStorage`. Use **ব্যাকআপ ডাউনলোড** to export a JSON backup and **JSON ব্যাকআপ আপলোড** to restore one. Importing a backup replaces the currently stored data. Keep separate backups because browser data is not synced between devices.
 
-- ওষুধের তালিকা স্বয়ংক্রিয়ভাবে বর্তমান ব্রাউজারের `localStorage`-এ সংরক্ষিত হয়।
-- **সেটিংস → JSON ডাউনলোড** থেকে ব্যাকআপ ফাইল নামিয়ে রাখুন।
-- **সেটিংস → JSON আপলোড** দিয়ে আগের Urvi Pharmacy ব্যাকআপ পুনরুদ্ধার করা যায়। আপলোডে বর্তমান ওষুধের তালিকা প্রতিস্থাপিত হবে এবং তার আগে নিশ্চিতকরণ দেখানো হবে।
-- ব্যাকআপে বর্তমানে ওষুধের তালিকা অন্তর্ভুক্ত। সব বিক্রয়, ক্রেতা, সরবরাহকারী বা রিপোর্টের ডেটা এই ডেমোতে পূর্ণাঙ্গভাবে সংরক্ষিত নয়।
-- `localStorage` শুধু একই ব্রাউজার/ডিভাইসে থাকে। ব্রাউজারের ডেটা মুছে গেলে তা হারাতে পারে, তাই নিয়মিত JSON ব্যাকআপ ডাউনলোড করুন। অন্য কম্পিউটারে নিতে হলে সেখানে JSON ফাইল আপলোড করুন।
+## Features
 
-## নোট
-
-এটি ফ্রন্টএন্ড প্রোটোটাইপ; কোনো সার্ভার-সাইড ডেটাবেস, authentication বা ক্লাউড সিঙ্ক নেই।
+- Bengali-language dashboard and responsive layout
+- Medicine list, adding/editing medicines, stock adjustment, low-stock warnings
+- Sales recording with automatic stock deduction
+- Supplier list
+- Inventory report
+- Local persistence and JSON backup import/export
